@@ -1,0 +1,14 @@
+name: Edgeserver Upload
+author: Lucemans
+description: Upload folder to edgeserver.io
+inputs:
+  server:
+    description: 'URL of Edgeserver Instance'
+    required: false
+    default: 'api.edgeserver.io'
+  app_id:
+    description: 'ID of the App to Deploy to'
+    required: true
+runs:
+  using: 'node16'
+  main: 'main.js'
