@@ -12,6 +12,10 @@ inputs:
   token:
     description: 'Auth Token to Access Edgeserver'
     required: true
+  directory:
+    description: 'Directory to upload'
+    default: 'dist'
+    required: false
 runs:
   using: 'node16'
   main: 'main.js'
