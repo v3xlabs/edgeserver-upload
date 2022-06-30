@@ -9,6 +9,9 @@ inputs:
   app_id:
     description: 'ID of the App to Deploy to'
     required: true
+  token:
+    description: 'Auth Token to Access Edgeserver'
+    required: true
 runs:
   using: 'node16'
   main: 'main.js'
