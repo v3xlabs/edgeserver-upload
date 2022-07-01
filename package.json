@@ -1,6 +1,6 @@
 {
   "name": "edgeserver-action",
-  "version": "0.0.16",
+  "version": "0.0.20",
   "description": "",
   "main": "index.js",
   "scripts": {
