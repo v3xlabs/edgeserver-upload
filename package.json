@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc && ncc build src/index.js -o lib && rm ./src/**.js"
+    "build": "tsc && ncc build src/index.js -o lib && rm ./src/**.js",
+    "precommit-msg": "echo 'Pre-commit checks...' && exit 0"
   },
   "keywords": [],
   "author": "",
@@ -22,6 +23,7 @@
     "chalk": "4.0.0"
   },
   "pre-commit": [
-    "build"
+    "build",
+    "precommit-msg"
   ]
 }
