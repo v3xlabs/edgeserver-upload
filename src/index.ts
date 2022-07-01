@@ -164,22 +164,15 @@ const version = require("../package.json")["version"];
     zippo.pipe(writeStrem);
     zippo.directory(resolve("./", config.directory), false);
 
-    const compressProgress = new SingleBar(
-        {
-            format: "   \u001b[90m{bar}\u001b[0m {percentage}% | ETA: {eta}s | {value}/{total}",
-        },
-        Presets.shades_classic,
-    );
-    compressProgress.start(sizeData.size, 0);
-
     zippo.on("progress", (data) => {
-        // log.empty();
-        compressProgress.update(data.fs.processedBytes);
+        log.empty(
+            "Compressing " +
+                Math.ceil((data.fs.processedBytes / sizeData.size) * 100) +
+                "%",
+        );
     });
 
     await zippo.finalize();
-
-    compressProgress.stop();
 
     const compressedData = await stat(resolve("./", "edgeserver_dist.zip"));
 
@@ -193,19 +186,7 @@ const version = require("../package.json")["version"];
     log["🚀"]("Deploying");
     log.empty(chalk.yellowBright("-".repeat(40)));
 
-    const uploadProgress = new SingleBar(
-        {
-            format: "   \u001b[90m{bar}\u001b[0m {percentage}% | ETA: {eta}s | {value}/{total}",
-        },
-        Presets.shades_classic,
-    );
-    uploadProgress.start(compressedData.size, 0);
-
     await new Promise<void>((acc) => setTimeout(acc, 3000));
-
-    uploadProgress.update(compressedData.size);
-
-    uploadProgress.stop();
 
     // log.empty(chalk.white(`[${chalk.greenBright("\u2588".repeat(32))}]`));
 
