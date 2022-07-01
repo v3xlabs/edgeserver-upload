@@ -15,11 +15,6 @@ import fetch, { blobFromSync, FormData } from "node-fetch";
 chalk.level = 1;
 process.env.FORCE_COLOR = "1";
 
-const clearLastLine = () => {
-    readline.moveCursor(process.stdout, 0, -1); // up one line
-    readline.clearLine(process.stdout, 1); // from cursor to end
-};
-
 const QUOTES = [
     "Well hello there",
     "Good morning me lad!",
@@ -88,40 +83,29 @@ const version = require("../package.json")["version"];
     log.empty(
         "Authored by " + chalk.gray`@lvksh`,
         "github.com/lvksh/edgeserver-upload",
-        "",
     );
 
     await new Promise<void>((reply) => setTimeout(reply, 1000));
 
+    log.empty();
     log["🌿"]("Relaxing....");
     log.empty(chalk.yellowBright("-".repeat(40)));
     log.empty(randomQuote());
 
+    log.empty();
     log["🔧"]('Context Data');
     log.empty(chalk.yellowBright('-'.repeat(40)));
 
-    const githubContext = {
-        // comment: github.context.,
-        git_sha: github.context.sha,
-        git_src: github.context.eventName,
-        git_type: '1', // Github
-        git_actor: github.context.actor,
-    };
-
-    log.empty(github.context);
-
-    // Install dependencies
-    // log.empty('');
-    // log['🔧']('Building...');
-    // log.empty(chalk.yellowBright('-'.repeat(40)));
-
-    // log.empty('Switching to ' + chalk.gray(global));
+    const shouldPushGithubContext = github.context && github.context.sha;
+    if (shouldPushGithubContext) {
+        log.empty('Loaded github context');
+    } else {
+        log.empty('No context to be found');
+    }
 
     log.empty();
     log["⚙️"]("Configuration");
     log.empty(chalk.yellowBright("-".repeat(40)));
-
-    log.empty("Loading...");
 
     const config = {
         server: process.env.EDGE_SERVER || core.getInput("server"),
@@ -129,8 +113,6 @@ const version = require("../package.json")["version"];
         token: process.env.EDGE_TOKEN || core.getInput("token"),
         directory: process.env.EDGE_DIRECTORY || core.getInput("directory"),
     };
-
-    clearLastLine();
 
     try {
         validateConfiguration.validateSync(config, { abortEarly: true });
