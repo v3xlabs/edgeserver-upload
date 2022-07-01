@@ -2,19 +2,17 @@ lockfileVersion: 5.4
 
 specifiers:
   '@actions/core': ^1.9.0
-  '@antfu/ni': ^0.16.3
   '@lvksh/logger': ^1.6.3
   '@types/node': ^18.0.0
+  '@vercel/ncc': ^0.34.0
   chalk: 4.0.0
-  edgeserver-action: 'link:'
   typescript: ^4.7.4
 
 dependencies:
   '@actions/core': 1.9.0
-  '@antfu/ni': 0.16.3
   '@lvksh/logger': 1.6.3
+  '@vercel/ncc': 0.34.0
   chalk: 4.0.0
-  edgeserver-action: 'link:'
 
 devDependencies:
   '@types/node': 18.0.0
@@ -34,11 +32,6 @@ packages:
       tunnel: 0.0.6
     dev: false
 
-  /@antfu/ni/0.16.3:
-    resolution: {integrity: sha512-/C1N/hORSJp1qJHr4oRqQzmWPqB6S42T4HV4dWhXOllPJkcqQA/L40U55Oc7Gq4Gm9pLeCNZn7YYU1kUK2Ekpg==}
-    hasBin: true
-    dev: false
-
   /@lvksh/logger/1.6.3:
     resolution: {integrity: sha512-xt7s3k9Dk7oaUH1GxU//vGdKftJ1UZkurwXJ189aB6CxY0cy6ATOSti5iTDh5BMsvEcT6Hk5GL/dF+HaZl+pQA==}
     dev: false
@@ -46,6 +39,11 @@ packages:
   /@types/node/18.0.0:
     resolution: {integrity: sha512-cHlGmko4gWLVI27cGJntjs/Sj8th9aYwplmZFwmmgYQQvL5NUsgVJG7OddLvNfLqYS31KFN0s3qlaD9qCaxACA==}
     dev: true
+
+  /@vercel/ncc/0.34.0:
+    resolution: {integrity: sha512-G9h5ZLBJ/V57Ou9vz5hI8pda/YQX5HQszCs3AmIus3XzsmRn/0Ptic5otD3xVST8QLKk7AMk7AqpsyQGN7MZ9A==}
+    hasBin: true
+    dev: false
 
   /ansi-styles/4.3.0:
     resolution: {integrity: sha512-zbB9rCJAT1rbjiVDb2hqKFHNYLxgtk8NURxZ3IZwD3F6NtxbXZQCnnSi1Lkx+IDohdPlFp222wVALIheZJQSEg==}

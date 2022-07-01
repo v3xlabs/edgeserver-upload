@@ -1,11 +1,11 @@
 {
   "name": "edgeserver-action",
-  "version": "0.0.7",
+  "version": "0.0.9",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc"
+    "build": "tsc && ncc build src/index.js -o lib && rm ./src/**.js"
   },
   "keywords": [],
   "author": "",
@@ -17,6 +17,7 @@
   "dependencies": {
     "@actions/core": "^1.9.0",
     "@lvksh/logger": "^1.6.3",
+    "@vercel/ncc": "^0.34.0",
     "chalk": "4.0.0"
   }
 }
