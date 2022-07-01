@@ -158,19 +158,20 @@ const version = require("../package.json")["version"];
     const zippo = archiver("zip");
 
     writeStrem.on("close", () => {
-        log.empty(zippo.pointer() + " total bytes");
+        // log.empty(zippo.pointer() + " total bytes");
+    });
+
+    zippo.on("progress", (data) => {
+        const percentage = Math.ceil((data.fs.processedBytes / sizeData.size) * 100);
+        log.empty(
+            "Compressing " +
+                (percentage > 100 ? 100 : percentage) +
+                "%",
+        );
     });
 
     zippo.pipe(writeStrem);
     zippo.directory(resolve("./", config.directory), false);
-
-    zippo.on("progress", (data) => {
-        log.empty(
-            "Compressing " +
-                Math.ceil((data.fs.processedBytes / sizeData.size) * 100) +
-                "%",
-        );
-    });
 
     await zippo.finalize();
 
