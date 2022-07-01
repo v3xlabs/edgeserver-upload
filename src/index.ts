@@ -1,1 +1,1 @@
-console.log('Edgeserver v0.0.5');
+console.log('Edgeserver v0.0.6');
