@@ -1,12 +1,12 @@
 {
   "name": "edgeserver-action",
-  "version": "0.0.20",
+  "version": "0.0.21",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc && ncc build src/index.js -o lib && rm ./src/**.js",
-    "precommit-msg": "echo 'Pre-commit checks...' && exit 0"
+    "install-precommit": "cp ./pre-commit.sh ./.git/hooks/pre-commit"
   },
   "keywords": [],
   "author": "",
@@ -21,9 +21,5 @@
     "@lvksh/logger": "^1.6.3",
     "@vercel/ncc": "^0.34.0",
     "chalk": "4.0.0"
-  },
-  "pre-commit": [
-    "build",
-    "precommit-msg"
-  ]
+  }
 }
