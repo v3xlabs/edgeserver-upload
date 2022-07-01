@@ -1,6 +1,7 @@
 import { createLogger } from "@lvksh/logger";
 import chalk from "chalk";
 import * as core from "@actions/core";
+import * as github from '@actions/github';
 import * as yup from "yup";
 import readline from "readline";
 import prettyBytes from "pretty-bytes";
@@ -8,9 +9,8 @@ import { logTreeData, treeFolderData } from "./treeFolder";
 import { resolve } from "path";
 import { stat } from "fs/promises";
 import archiver from "archiver";
-import { createReadStream, createWriteStream, readFileSync } from "fs";
-import fetch, { blobFromSync, fileFromSync, FormData } from "node-fetch";
-// import { FormData, File } from "formdata-node";
+import { createWriteStream } from "fs";
+import fetch, { blobFromSync, FormData } from "node-fetch";
 
 chalk.level = 1;
 process.env.FORCE_COLOR = "1";
@@ -96,6 +96,19 @@ const version = require("../package.json")["version"];
     log["🌿"]("Relaxing....");
     log.empty(chalk.yellowBright("-".repeat(40)));
     log.empty(randomQuote());
+
+    log["🔧"]('Context Data');
+    log.empty(chalk.yellowBright('-'.repeat(40)));
+
+    const githubContext = {
+        // comment: github.context.,
+        git_sha: github.context.sha,
+        git_src: github.context.eventName,
+        git_type: '1', // Github
+        git_actor: github.context.actor,
+    };
+
+    log.empty(github.context);
 
     // Install dependencies
     // log.empty('');

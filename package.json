@@ -1,15 +1,15 @@
 {
   "name": "edgeserver-action",
-  "version": "0.0.31",
+  "version": "0.0.32",
   "description": "",
-  "main": "index.js",
+  "main": "lib/index.js",
   "scripts": {
     "test": "set -a && source ./.env && set +a && pnpm build && pnpm node ./lib/index.js",
     "build": "tsc && ncc build src/index.js -o lib && rm ./src/**.js",
     "install-precommit": "cp ./pre-commit.sh ./.git/hooks/pre-commit"
   },
   "keywords": [],
-  "author": "",
+  "author": "lvkdotsh",
   "license": "GPL-3.0",
   "devDependencies": {
     "@types/archiver": "^5.3.1",
@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@actions/core": "^1.9.0",
+    "@actions/github": "^5.0.3",
     "@lvksh/logger": "^1.6.3",
     "@vercel/ncc": "^0.34.0",
     "archiver": "^5.3.1",
