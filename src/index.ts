@@ -52,10 +52,10 @@ const version = require('../package.json')['version'];
     log.empty(chalk.yellowBright("-".repeat(40)));
 
     const config = {
-        server: core.getInput("server"),
-        app_id: core.getInput("app_id"),
-        token: core.getInput("token"),
-        directory: core.getInput("directory"),
+        server: core.getInput("server", {required: true}),
+        app_id: core.getInput("app_id", {required: true}).toString(),
+        token: core.getInput("token", {required: true}),
+        directory: core.getInput("directory", {required: false}),
     };
 
     log.empty('Server: ' + chalk.gray(config.server));
