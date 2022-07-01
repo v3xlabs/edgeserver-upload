@@ -2,10 +2,12 @@ import { createLogger } from "@lvksh/logger";
 import chalk from "chalk";
 import * as core from "@actions/core";
 
+chalk.level = 1;
+
 const log = createLogger(
     {
         "🚀": "🚀",
-        "⚙️": "⚙️ ",
+        "⚙️": "⚙️",
         "🔧": "🔧",
         "🌿": "🌿",
         "💨": "💨",
