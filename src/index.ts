@@ -2,7 +2,13 @@ import { createLogger } from "@lvksh/logger";
 import chalk from "chalk";
 import * as core from "@actions/core";
 import * as yup from "yup";
+import * as ora from "ora";
 import readline from "readline";
+import prettyBytes from "pretty-bytes";
+import { logTreeData, treeFolderData } from "./treeFolder";
+import { resolve } from "path";
+import { zip } from "zip-a-folder";
+import { stat } from "fs/promises";
 
 chalk.level = 1;
 process.env.FORCE_COLOR = "1";
@@ -11,6 +17,17 @@ const clearLastLine = () => {
     readline.moveCursor(process.stdout, 0, -1); // up one line
     readline.clearLine(process.stdout, 1); // from cursor to end
 };
+
+const QUOTES = [
+    "Well hello there",
+    "Good morning me lad!",
+    "Lets goooooo!!",
+    "Visit https://og.ax/ for a good laugh.",
+    "Hope you are doing okay 😇",
+    "See you on the other side 🎉",
+];
+
+const randomQuote = () => QUOTES[Math.floor(Math.random() * QUOTES.length)];
 
 const validateConfiguration = yup
     .object({
@@ -46,6 +63,7 @@ const log = createLogger(
         "🌿": "🌿",
         "💨": "💨",
         "⭐": "⭐",
+        "📁": "📁",
         empty: {
             label: "  ",
         },
@@ -75,6 +93,7 @@ const version = require("../package.json")["version"];
 
     log["🌿"]("Relaxing....");
     log.empty(chalk.yellowBright("-".repeat(40)));
+    log.empty(randomQuote());
 
     // Install dependencies
     // log.empty('');
@@ -90,10 +109,10 @@ const version = require("../package.json")["version"];
     log.empty("Loading...");
 
     const config = {
-        server: core.getInput("server"),
-        app_id: core.getInput("app_id").toString(),
-        token: core.getInput("token"),
-        directory: core.getInput("directory"),
+        server: process.env.EDGE_SERVER || core.getInput("server"),
+        app_id: process.env.EDGE_APP_ID || core.getInput("app_id").toString(),
+        token: process.env.EDGE_TOKEN || core.getInput("token"),
+        directory: process.env.EDGE_DIRECTORY || core.getInput("directory"),
     };
 
     clearLastLine();
@@ -118,10 +137,48 @@ const version = require("../package.json")["version"];
     );
 
     log.empty("");
+    log["📁"]("Compressing Application");
+    log.empty(chalk.yellowBright("-".repeat(40)));
+
+    const scanSpinner = ora.default("Compressing " + config.directory).start();
+
+    const sizeData = await treeFolderData(resolve("./", config.directory));
+
+    scanSpinner.stop();
+
+    log.empty("Files Overview:");
+    logTreeData(sizeData, log.empty);
+
+    log.empty("");
+
+    const compressSpinner = ora
+        .default("Compressing " + config.directory)
+        .start();
+
+    await zip(
+        resolve("./", config.directory),
+        resolve("./", "edgeserver_dist.zip"),
+    );
+
+    const compressedData = await stat(resolve("./", "edgeserver_dist.zip"));
+
+    compressSpinner.stop();
+
+    log.empty(
+        "Compressed to " + chalk.yellowBright(prettyBytes(compressedData.size)),
+    );
+
+    log.empty("");
     log["🚀"]("Deploying");
     log.empty(chalk.yellowBright("-".repeat(40)));
-    log.empty("");
-    log.empty(chalk.white(`[${chalk.greenBright("\u2588".repeat(32))}]`));
+
+    const uploadSpinner = ora.default("Compressing " + config.directory).start();
+
+    await new Promise<void>(acc => setTimeout(acc, 3000));
+
+    uploadSpinner.stop();
+
+    // log.empty(chalk.white(`[${chalk.greenBright("\u2588".repeat(32))}]`));
 
     log.empty("", "");
 })();

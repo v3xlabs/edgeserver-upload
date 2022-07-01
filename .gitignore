@@ -1,2 +1,5 @@
 node_modules
 pnpm-error.log
+.env
+dist
+edgeserver_dist.zip

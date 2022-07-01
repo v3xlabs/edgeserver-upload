@@ -1,10 +1,10 @@
 {
   "name": "edgeserver-action",
-  "version": "0.0.23",
+  "version": "0.0.24",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "set -a && source ./.env && set +a && pnpm build && pnpm node ./lib/index.js",
     "build": "tsc && ncc build src/index.js -o lib && rm ./src/**.js",
     "install-precommit": "cp ./pre-commit.sh ./.git/hooks/pre-commit"
   },
@@ -21,6 +21,10 @@
     "@lvksh/logger": "^1.6.3",
     "@vercel/ncc": "^0.34.0",
     "chalk": "4.0.0",
-    "yup": "^0.32.11"
+    "cli-spinners": "^2.6.1",
+    "ora": "^6.1.2",
+    "pretty-bytes": "^6.0.0",
+    "yup": "^0.32.11",
+    "zip-a-folder": "^1.1.5"
   }
 }
