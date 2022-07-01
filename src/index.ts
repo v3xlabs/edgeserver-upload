@@ -2,16 +2,14 @@ import { createLogger } from "@lvksh/logger";
 import chalk from "chalk";
 import * as core from "@actions/core";
 import * as yup from "yup";
-import * as ora from "ora";
 import readline from "readline";
 import prettyBytes from "pretty-bytes";
 import { logTreeData, treeFolderData } from "./treeFolder";
 import { resolve } from "path";
-import { zip } from "zip-a-folder";
 import { stat } from "fs/promises";
-import { Presets, SingleBar } from "cli-progress";
 import archiver from "archiver";
-import { createWriteStream } from "fs";
+import { createWriteStream, readFileSync } from "fs";
+import fetch, { FormData } from "node-fetch";
 
 chalk.level = 1;
 process.env.FORCE_COLOR = "1";
@@ -129,6 +127,7 @@ const version = require("../package.json")["version"];
                 "\t" + chalk.white(chalk.bgCyanBright(` ${error.errors[0]} `)),
             );
         }
+        process.exit(1);
         return;
     }
 
@@ -150,24 +149,14 @@ const version = require("../package.json")["version"];
 
     log.empty("");
 
-    // const compressSpinner = ora
-    //     .default("Compressing " + config.directory)
-    //     .start();
-
     const writeStrem = createWriteStream(resolve("./", "edgeserver_dist.zip"));
     const zippo = archiver("zip");
 
-    writeStrem.on("close", () => {
-        // log.empty(zippo.pointer() + " total bytes");
-    });
-
     zippo.on("progress", (data) => {
-        const percentage = Math.ceil((data.fs.processedBytes / sizeData.size) * 100);
-        log.empty(
-            "Compressing " +
-                (percentage > 100 ? 100 : percentage) +
-                "%",
+        const percentage = Math.ceil(
+            (data.fs.processedBytes / sizeData.size) * 100,
         );
+        log.empty("Compressing " + (percentage > 100 ? 100 : percentage) + "%");
     });
 
     zippo.pipe(writeStrem);
@@ -187,7 +176,31 @@ const version = require("../package.json")["version"];
     log["🚀"]("Deploying");
     log.empty(chalk.yellowBright("-".repeat(40)));
 
-    await new Promise<void>((acc) => setTimeout(acc, 3000));
+    const formData = new FormData();
+    const data = readFileSync(resolve("./", "edgeserver_dist.zip"));
+    formData.append("data", data.toString());
+
+    const uploadRequest = await fetch(
+        config.server + "/deployments/push?site=" + config.app_id,
+        {
+            method: "PUT",
+            headers: {
+                Authorization: "Bearer " + config.token,
+            },
+            //@ts-ignore
+            body: formData,
+        }
+    );
+
+    const status = uploadRequest.status;
+    if (status != 200) {
+        log.empty(chalk.redBright('Unauthorized.... Check your auth token\'s validity.'));
+        process.exit(1);
+        return;
+    }
+
+    log.empty((await uploadRequest.json()) as any);
+    // await new Promise<void>((acc) => setTimeout(acc, 3000));
 
     // log.empty(chalk.white(`[${chalk.greenBright("\u2588".repeat(32))}]`));
 

@@ -63,7 +63,7 @@ export const logTreeData = (
     indents: number = 0,
 ) => {
     if (indents != 0 && treeData["name"])
-        log(` ${" ".repeat(indents == 0 ? 0 : indents - 1)}${chalk.cyanBright('/' + treeData["name"])}`);
+        log(` ${"\u00A0".repeat(indents == 0 ? 0 : indents - 1)}${chalk.cyanBright('/' + treeData["name"])}`);
 
     for (let fileOrFolder of treeData.files) {
         if (fileOrFolder.type === "folder") {
@@ -72,7 +72,7 @@ export const logTreeData = (
         }
         if (fileOrFolder.type === "file") {
             log(
-                ` ${" ".repeat(indents)}${
+                ` ${"\u00A0".repeat(indents)}${
                     chalk.gray(fileOrFolder.name)
                 } ${chalk.gray("-")} ${chalk.yellowBright(
                     prettyBytes(fileOrFolder.size),
