@@ -7,14 +7,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: "16.11.0"
-          registry-url: "https://registry.npmjs.org"
-      - run: yarn
-      - name: Build
-      - name: Build Typescript
-        run: yarn build
+      # - uses: actions/setup-node@v2
+      #   with:
+      #     node-version: "16.11.0"
+          # registry-url: "https://registry.npmjs.org"
+      # - run: yarn
+      # - name: Build
+      # - name: Build Typescript
+        # run: yarn build
       # - name: Building Typescript
       #   uses: FuLagann/tsc-build-push@v1
       #   with:
@@ -22,11 +22,3 @@ jobs:
       #     user-email: "rick@og.ax"
       #     message: "Automatically built unbuilt typescript"
       #     directories: ./
-      - name: Upload
-        uses: xresloader/upload-to-github-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          file: "src/*.js"
-          tags: true
-          draft: true
