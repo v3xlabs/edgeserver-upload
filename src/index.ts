@@ -3,6 +3,7 @@ import chalk from "chalk";
 import * as core from "@actions/core";
 
 chalk.level = 1;
+process.env.FORCE_COLOR = '1';
 
 const log = createLogger(
     {
