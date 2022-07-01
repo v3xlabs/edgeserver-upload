@@ -1,6 +1,6 @@
 import { createLogger } from "@lvksh/logger";
 import chalk from "chalk";
-import core from "@actions/core";
+import * as core from "@actions/core";
 
 const log = createLogger(
     {
