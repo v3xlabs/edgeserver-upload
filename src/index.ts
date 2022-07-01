@@ -141,7 +141,7 @@ const version = require("../package.json")["version"];
     const sizeData = await treeFolderData(resolve("./", config.directory));
 
     log.empty("Files Overview:");
-    logTreeData(sizeData, log.empty);
+    logTreeData(sizeData, console.log);
 
     log.empty("");
 
