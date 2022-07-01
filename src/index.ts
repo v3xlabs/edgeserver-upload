@@ -8,8 +8,9 @@ import { logTreeData, treeFolderData } from "./treeFolder";
 import { resolve } from "path";
 import { stat } from "fs/promises";
 import archiver from "archiver";
-import { createWriteStream, readFileSync } from "fs";
-import fetch, { FormData } from "node-fetch";
+import { createReadStream, createWriteStream, readFileSync } from "fs";
+import fetch, { blobFromSync, fileFromSync, FormData } from "node-fetch";
+// import { FormData, File } from "formdata-node";
 
 chalk.level = 1;
 process.env.FORCE_COLOR = "1";
@@ -177,8 +178,7 @@ const version = require("../package.json")["version"];
     log.empty(chalk.yellowBright("-".repeat(40)));
 
     const formData = new FormData();
-    const data = readFileSync(resolve("./", "edgeserver_dist.zip"));
-    formData.append("data", data.toString());
+    formData.set("data", blobFromSync(resolve("./", "edgeserver_dist.zip")));
 
     const uploadRequest = await fetch(
         config.server + "/deployments/push?site=" + config.app_id,
@@ -187,21 +187,32 @@ const version = require("../package.json")["version"];
             headers: {
                 Authorization: "Bearer " + config.token,
             },
-            //@ts-ignore
             body: formData,
-        }
+        },
     );
 
     const status = uploadRequest.status;
+
     if (status != 200) {
-        log.empty(chalk.redBright('Unauthorized.... Check your auth token\'s validity.'));
+        if (status == 403) {
+            log.empty(
+                chalk.redBright(
+                    "Unauthorized.... Check your auth token's validity.",
+                ),
+            );
+        } else {
+            log.empty(
+                chalk.yellowBright('Unknown error with status code ' + status)
+            );
+        }
         process.exit(1);
         return;
     }
 
-    log.empty((await uploadRequest.json()) as any);
-    // await new Promise<void>((acc) => setTimeout(acc, 3000));
+    await uploadRequest.text();
 
+    log.empty(chalk.greenBright("Successfully Deployed 😊"));
+    
     // log.empty(chalk.white(`[${chalk.greenBright("\u2588".repeat(32))}]`));
 
     log.empty("", "");

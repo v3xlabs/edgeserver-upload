@@ -1,6 +1,6 @@
 {
   "name": "edgeserver-action",
-  "version": "0.0.30",
+  "version": "0.0.31",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -27,6 +27,7 @@
     "cli-progress": "^3.11.2",
     "cli-spinners": "^2.6.1",
     "form-data": "^4.0.0",
+    "formdata-node": "^4.3.3",
     "node-fetch": "^3.2.6",
     "ora": "^6.1.2",
     "pretty-bytes": "^6.0.0",

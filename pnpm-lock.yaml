@@ -12,6 +12,7 @@ specifiers:
   cli-progress: ^3.11.2
   cli-spinners: ^2.6.1
   form-data: ^4.0.0
+  formdata-node: ^4.3.3
   node-fetch: ^3.2.6
   ora: ^6.1.2
   pre-commit: ^1.2.2
@@ -29,6 +30,7 @@ dependencies:
   cli-progress: 3.11.2
   cli-spinners: 2.6.1
   form-data: 4.0.0
+  formdata-node: 4.3.3
   node-fetch: 3.2.6
   ora: 6.1.2
   pretty-bytes: 6.0.0
@@ -355,6 +357,14 @@ packages:
       asynckit: 0.4.0
       combined-stream: 1.0.8
       mime-types: 2.1.35
+    dev: false
+
+  /formdata-node/4.3.3:
+    resolution: {integrity: sha512-coTew7WODO2vF+XhpUdmYz4UBvlsiTMSNaFYZlrXIqYbFd4W7bMwnoALNLE6uvNgzTg2j1JDF0ZImEfF06VPAA==}
+    engines: {node: '>= 12.20'}
+    dependencies:
+      node-domexception: 1.0.0
+      web-streams-polyfill: 4.0.0-beta.1
     dev: false
 
   /formdata-polyfill/4.0.10:
@@ -729,6 +739,11 @@ packages:
   /web-streams-polyfill/3.2.1:
     resolution: {integrity: sha512-e0MO3wdXWKrLbL0DgGnUV7WHVuw9OUvL4hjgnPkIeEvESk74gAITi5G606JtZPp39cd8HA9VQzCIvA49LpPN5Q==}
     engines: {node: '>= 8'}
+    dev: false
+
+  /web-streams-polyfill/4.0.0-beta.1:
+    resolution: {integrity: sha512-3ux37gEX670UUphBF9AMCq8XM6iQ8Ac6A+DSRRjDoRBm1ufCkaCDdNVbaqq60PsEkdNlLKrGtv/YBP4EJXqNtQ==}
+    engines: {node: '>= 12'}
     dev: false
 
   /which/1.2.14:
