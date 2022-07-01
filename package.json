@@ -1,6 +1,6 @@
 {
   "name": "edgeserver-action",
-  "version": "0.0.24",
+  "version": "0.0.25",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -12,6 +12,8 @@
   "author": "",
   "license": "GPL-3.0",
   "devDependencies": {
+    "@types/archiver": "^5.3.1",
+    "@types/cli-progress": "^3.11.0",
     "@types/node": "^18.0.0",
     "pre-commit": "^1.2.2",
     "typescript": "^4.7.4"
@@ -20,7 +22,9 @@
     "@actions/core": "^1.9.0",
     "@lvksh/logger": "^1.6.3",
     "@vercel/ncc": "^0.34.0",
+    "archiver": "^5.3.1",
     "chalk": "4.0.0",
+    "cli-progress": "^3.11.2",
     "cli-spinners": "^2.6.1",
     "ora": "^6.1.2",
     "pretty-bytes": "^6.0.0",

@@ -9,6 +9,9 @@ import { logTreeData, treeFolderData } from "./treeFolder";
 import { resolve } from "path";
 import { zip } from "zip-a-folder";
 import { stat } from "fs/promises";
+import { Presets, SingleBar } from "cli-progress";
+import archiver from "archiver";
+import { createWriteStream } from "fs";
 
 chalk.level = 1;
 process.env.FORCE_COLOR = "1";
@@ -140,29 +143,47 @@ const version = require("../package.json")["version"];
     log["📁"]("Compressing Application");
     log.empty(chalk.yellowBright("-".repeat(40)));
 
-    const scanSpinner = ora.default("Compressing " + config.directory).start();
-
     const sizeData = await treeFolderData(resolve("./", config.directory));
-
-    scanSpinner.stop();
 
     log.empty("Files Overview:");
     logTreeData(sizeData, log.empty);
 
     log.empty("");
 
-    const compressSpinner = ora
-        .default("Compressing " + config.directory)
-        .start();
+    // const compressSpinner = ora
+    //     .default("Compressing " + config.directory)
+    //     .start();
 
-    await zip(
-        resolve("./", config.directory),
-        resolve("./", "edgeserver_dist.zip"),
+    const writeStrem = createWriteStream(resolve("./", "edgeserver_dist.zip"));
+    const zippo = archiver("zip");
+
+    writeStrem.on("close", () => {
+        log.empty(zippo.pointer() + " total bytes");
+    });
+
+    zippo.pipe(writeStrem);
+    zippo.directory(resolve("./", config.directory), false);
+
+    const compressProgress = new SingleBar(
+        {
+            format: "   \u001b[90m{bar}\u001b[0m {percentage}% | ETA: {eta}s | {value}/{total}",
+        },
+        Presets.shades_classic,
     );
+    compressProgress.start(sizeData.size, 0);
+
+    zippo.on("progress", (data) => {
+        // log.empty();
+        compressProgress.update(data.fs.processedBytes);
+    });
+
+    await zippo.finalize();
+
+    compressProgress.stop();
 
     const compressedData = await stat(resolve("./", "edgeserver_dist.zip"));
 
-    compressSpinner.stop();
+    log.empty("");
 
     log.empty(
         "Compressed to " + chalk.yellowBright(prettyBytes(compressedData.size)),
@@ -172,11 +193,19 @@ const version = require("../package.json")["version"];
     log["🚀"]("Deploying");
     log.empty(chalk.yellowBright("-".repeat(40)));
 
-    const uploadSpinner = ora.default("Compressing " + config.directory).start();
+    const uploadProgress = new SingleBar(
+        {
+            format: "   \u001b[90m{bar}\u001b[0m {percentage}% | ETA: {eta}s | {value}/{total}",
+        },
+        Presets.shades_classic,
+    );
+    uploadProgress.start(compressedData.size, 0);
 
-    await new Promise<void>(acc => setTimeout(acc, 3000));
+    await new Promise<void>((acc) => setTimeout(acc, 3000));
 
-    uploadSpinner.stop();
+    uploadProgress.update(compressedData.size);
+
+    uploadProgress.stop();
 
     // log.empty(chalk.white(`[${chalk.greenBright("\u2588".repeat(32))}]`));
 
