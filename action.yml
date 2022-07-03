@@ -16,6 +16,10 @@ inputs:
     description: 'Directory to upload'
     default: 'dist'
     required: false
+  context:
+    description: 'Upload github action context'
+    default: '1'
+    required: false
 runs:
   using: 'node16'
   main: 'lib/index.js'

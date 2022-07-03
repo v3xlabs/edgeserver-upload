@@ -1,7 +1,7 @@
 import { createLogger } from "@lvksh/logger";
 import chalk from "chalk";
 import * as core from "@actions/core";
-import * as github from '@actions/github';
+import * as github from "@actions/github";
 import * as yup from "yup";
 import readline from "readline";
 import prettyBytes from "pretty-bytes";
@@ -93,14 +93,14 @@ const version = require("../package.json")["version"];
     log.empty(randomQuote());
 
     log.empty();
-    log["🔧"]('Context Data');
-    log.empty(chalk.yellowBright('-'.repeat(40)));
+    log["🔧"]("Context Data");
+    log.empty(chalk.yellowBright("-".repeat(40)));
 
     const shouldPushGithubContext = github.context && github.context.sha;
     if (shouldPushGithubContext) {
-        log.empty('Loaded github context');
+        log.empty("Loaded github context");
     } else {
-        log.empty('No context to be found');
+        log.empty("No context to be found");
     }
 
     log.empty();
@@ -112,6 +112,9 @@ const version = require("../package.json")["version"];
         app_id: process.env.EDGE_APP_ID || core.getInput("app_id").toString(),
         token: process.env.EDGE_TOKEN || core.getInput("token"),
         directory: process.env.EDGE_DIRECTORY || core.getInput("directory"),
+        context: ["1", "true"].includes(
+            process.env.EDGE_CONTEXT || core.getInput("context"),
+        ),
     };
 
     try {
@@ -132,6 +135,11 @@ const version = require("../package.json")["version"];
     log.empty("Directory: " + chalk.yellowBright(config.directory));
     log.empty(
         "Token: " + chalk.gray("*".repeat(4) + ` [${config.token.length}]`),
+    );
+    log.empty(
+        "Github Context: " + config.context
+            ? chalk.greenBright("Yes")
+            : chalk.yellowBright(""),
     );
 
     log.empty("");
@@ -172,8 +180,26 @@ const version = require("../package.json")["version"];
     log["🚀"]("Deploying");
     log.empty(chalk.yellowBright("-".repeat(40)));
 
+    const context = {
+        contextType: 'github-action',
+        data: {
+            event: github.context.eventName,
+            sha: github.context.sha,
+            workflow: github.context.workflow,
+            runNumber: github.context.runNumber,
+            runId: github.context.runId,
+            server_url: github.context.serverUrl,
+            ref: github.context.ref,
+            actor: github.context.actor,
+            sender: github.context.actor,
+            commit: github.context.payload['head_commit'] || github.context.payload['commits'][0],
+        }
+    };
+
     const formData = new FormData();
     formData.set("data", blobFromSync(resolve("./", "edgeserver_dist.zip")));
+
+    if (config.context) formData.set("context", JSON.stringify(context));
 
     const uploadRequest = await fetch(
         config.server + "/deployments/push?site=" + config.app_id,
@@ -197,7 +223,7 @@ const version = require("../package.json")["version"];
             );
         } else {
             log.empty(
-                chalk.yellowBright('Unknown error with status code ' + status)
+                chalk.yellowBright("Unknown error with status code " + status),
             );
         }
         process.exit(1);
@@ -207,7 +233,7 @@ const version = require("../package.json")["version"];
     await uploadRequest.text();
 
     log.empty(chalk.greenBright("Successfully Deployed 😊"));
-    
+
     // log.empty(chalk.white(`[${chalk.greenBright("\u2588".repeat(32))}]`));
 
     log.empty("", "");
