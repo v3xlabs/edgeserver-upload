@@ -197,10 +197,11 @@ const version = require("../package.json")["version"];
     };
 
     const formData = new FormData();
-    formData.set("data", blobFromSync(resolve("./", "edgeserver_dist.zip")));
-
+    
     if (config.context) formData.set("context", JSON.stringify(context));
 
+    formData.set("data", blobFromSync(resolve("./", "edgeserver_dist.zip")));
+    
     const uploadRequest = await fetch(
         config.server + "/deployments/push?site=" + config.app_id,
         {
