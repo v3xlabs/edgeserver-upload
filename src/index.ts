@@ -175,7 +175,8 @@ const version = require('../package.json')['version'];
 
     await zippo.finalize();
 
-    const compressedData = await stat(resolve('./', ZIPLOCATION));
+    const file_path = resolve('./', ZIPLOCATION);
+    const compressedData = await stat(file_path);
 
     log.empty('');
 
@@ -211,11 +212,11 @@ const version = require('../package.json')['version'];
 
     if (config.context) formData.set('context', JSON.stringify(context));
 
-    const filePath = resolve('./', ZIPLOCATION);
-
     log.empty('Loading blob....');
 
-    const file = await blobFrom(filePath);
+    const file = await blobFrom(file_path);
+
+    log.empty('Blob size: ' + file.size);
 
     formData.set('data', file);
 
