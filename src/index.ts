@@ -6,7 +6,7 @@ import chalk from 'chalk';
 import { createWriteStream } from 'node:fs';
 import { stat } from 'node:fs/promises';
 import { resolve } from 'node:path';
-import fetch, { blobFromSync, FormData } from 'node-fetch';
+import fetch, { blobFrom, FormData } from 'node-fetch';
 import prettyBytes from 'pretty-bytes';
 import * as yup from 'yup';
 
@@ -211,7 +211,15 @@ const version = require('../package.json')['version'];
 
     if (config.context) formData.set('context', JSON.stringify(context));
 
-    formData.set('data', blobFromSync(resolve('./', ZIPLOCATION)));
+    const filePath = resolve('./', ZIPLOCATION);
+
+    log.empty('Loading blob....');
+
+    const file = await blobFrom(filePath);
+
+    formData.set('data', file);
+
+    log.empty('Uploading blob....');
 
     const uploadRequest = await fetch(
         config.server + '/deployments/push?site=' + config.app_id,
@@ -230,6 +238,7 @@ const version = require('../package.json')['version'];
         if (status == 403) {
             log.empty(
                 chalk.redBright(
+                    // eslint-disable-next-line quotes
                     "Unauthorized.... Check your auth token's validity."
                 )
             );
@@ -239,6 +248,7 @@ const version = require('../package.json')['version'];
             );
         }
 
+        // eslint-disable-next-line unicorn/no-process-exit
         process.exit(1);
 
         return;
