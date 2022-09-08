@@ -214,10 +214,12 @@ const version = require('../package.json')['version'];
 
     log.empty('Loading blob....');
 
-    const file = await blobFrom(file_path);
-
+    await new Promise<void>(acc => setTimeout(acc, 2000));
+    
     await chmod(file_path, '777');
 
+    const file = await blobFrom(file_path);
+    
     log.empty('Blob size: ' + file.size);
 
     formData.set('data', file);
