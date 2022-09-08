@@ -4,7 +4,7 @@ import { createLogger } from '@lvksh/logger';
 import archiver from 'archiver';
 import chalk from 'chalk';
 import { createWriteStream } from 'node:fs';
-import { stat } from 'node:fs/promises';
+import { chmod, stat } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import fetch, { blobFrom, FormData } from 'node-fetch';
 import prettyBytes from 'pretty-bytes';
@@ -215,6 +215,8 @@ const version = require('../package.json')['version'];
     log.empty('Loading blob....');
 
     const file = await blobFrom(file_path);
+
+    await chmod(file_path, '777');
 
     log.empty('Blob size: ' + file.size);
 
