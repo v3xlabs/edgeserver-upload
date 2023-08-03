@@ -33,7 +33,7 @@
         "cli-spinners": "^2.6.1",
         "form-data": "^4.0.0",
         "formdata-node": "^4.3.3",
-        "node-fetch": "^3.2.6",
+        "node-fetch": "^3.2.10",
         "ora": "^6.1.2",
         "pretty-bytes": "^6.0.0",
         "yup": "^0.32.11",
