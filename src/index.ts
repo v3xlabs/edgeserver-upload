@@ -19,7 +19,6 @@ const QUOTES = [
     'Well hello there',
     'Good morning me lad!',
     'Lets goooooo!!',
-    'Visit https://og.ax/ for a good laugh.',
     'Hope you are doing okay 😇',
     'See you on the other side 🎉',
 ];
