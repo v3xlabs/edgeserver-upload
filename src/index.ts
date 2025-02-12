@@ -33,17 +33,16 @@ const validateConfiguration = yup
             .string()
             .required('Please specify a server')
             .url('Not a URL'),
-        app_id: yup
+        site_id: yup
             .string()
             .min(
                 1,
-                'Please specify an app_id, you find this on your apps page.'
+                'Please specify a site_id, you find this on your apps page.'
             )
             .matches(
-                /^(?!([\d.]+[Ee]]\+\d+))\d+$/,
-                'Invalid app_id, try adding quotes around it.'
-            )
-            .matches(/\d+/m, 'Invalid app_id, make it a number'),
+                /^s_(?!([\d.]+[Ee]]\+\d+))\d+$/,
+                'Invalid site_id, try adding quotes around it.'
+            ),
         token: yup
             .string()
             .required('Please specify a token, see /keys for more'),
@@ -111,7 +110,7 @@ const version = require('../package.json')['version'];
 
     const config = {
         server: process.env.EDGE_SERVER || core.getInput('server'),
-        app_id: process.env.EDGE_APP_ID || core.getInput('app_id').toString(),
+        site_id: process.env.EDGE_SITE_ID || core.getInput('site_id').toString(),
         token: process.env.EDGE_TOKEN || core.getInput('token'),
         directory: process.env.EDGE_DIRECTORY || core.getInput('directory'),
         context: ['1', 'true'].includes(
@@ -126,7 +125,7 @@ const version = require('../package.json')['version'];
             log.empty(
                 'Error Validating ' + chalk.yellowBright(error.path),
                 '\t' +
-                    chalk.white(chalk.bgCyanBright(` ${error.errors.at(0)} `))
+                chalk.white(chalk.bgCyanBright(` ${error.errors.at(0)} `))
             );
         }
 
@@ -136,7 +135,7 @@ const version = require('../package.json')['version'];
     }
 
     log.empty('Server: ' + chalk.gray(config.server));
-    log.empty('App ID: ' + chalk.gray(config.app_id));
+    log.empty('App ID: ' + chalk.gray(config.site_id));
     log.empty('Directory: ' + chalk.yellowBright(config.directory));
     log.empty(
         'Token: ' + chalk.gray('*'.repeat(4) + ` [${config.token.length}]`)
@@ -201,7 +200,7 @@ const version = require('../package.json')['version'];
             sender: github.context.actor,
             commit:
                 github.context.payload['head_commit'] ||
-                github.context.payload['commits']
+                    github.context.payload['commits']
                     ? github.context.payload['commits'].at(0)
                     : undefined,
         },
@@ -214,11 +213,11 @@ const version = require('../package.json')['version'];
     log.empty('Loading blob....');
 
     await new Promise<void>(acc => setTimeout(acc, 2000));
-    
+
     await chmod(file_path, '777');
 
     const file = await blobFrom(file_path);
-    
+
     log.empty('Blob size: ' + file.size);
 
     formData.set('data', file);
@@ -226,7 +225,7 @@ const version = require('../package.json')['version'];
     log.empty('Uploading blob....');
 
     const uploadRequest = await fetch(
-        config.server + + '/site/' + config.app_id + '/deployment',
+        config.server + + '/site/' + config.site_id + '/deployment',
         {
             method: 'POST',
             headers: {
