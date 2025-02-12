@@ -40,7 +40,7 @@ const validateConfiguration = yup
                 'Please specify a site_id, you find this on your apps page.'
             )
             .matches(
-                /^s_(?!([\d.]+[Ee]]\+\d+))\d+$/,
+                /^s_[a-z0-9]+$/,
                 'Invalid site_id, try adding quotes around it.'
             ),
         token: yup
