@@ -54,6 +54,7 @@ const validateConfiguration = yup
 
 const log = createLogger(
     {
+        '✨': '✨',
         '🚀': '🚀',
         '⚙️': '⚙️ ',
         '🔧': '🔧',
