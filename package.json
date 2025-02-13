@@ -5,7 +5,7 @@
     "main": "lib/run/index.js",
     "scripts": {
         "test": "set -a && source ./.env && set +a && pnpm build && pnpm node ./lib/index.js",
-        "build": "pnpm build-run && pnpm build-pre && pnpm build-post && rm ./src/**.js",
+        "build": "pnpm build-run && pnpm build-pre && pnpm build-post && rm ./src/*.js && rm ./src/**/*.js",
         "build-run": "tsc && ncc build src/index.js -o lib/run",
         "build-pre": "tsc && ncc build src/pre.js -o lib/pre",
         "build-post": "tsc && ncc build src/post.js -o lib/post",
