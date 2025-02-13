@@ -225,7 +225,7 @@ const version = require('../package.json')['version'];
     log.empty('Uploading blob....');
 
     const uploadRequest = await fetch(
-        config.server + + '/site/' + config.site_id + '/deployment',
+        config.server + '/site/' + config.site_id + '/deployment',
         {
             method: 'POST',
             headers: {
