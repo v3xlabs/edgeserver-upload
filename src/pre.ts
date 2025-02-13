@@ -3,12 +3,13 @@ import * as github from '@actions/github';
 import { createLogger } from '@lvksh/logger';
 import archiver from 'archiver';
 import chalk from 'chalk';
-import { createWriteStream } from 'node:fs';
+import { createWriteStream, mkdirSync, writeFileSync } from 'node:fs';
 import { chmod, stat } from 'node:fs/promises';
-import { resolve } from 'node:path';
+import path, { resolve } from 'node:path';
 import fetch, { blobFrom, FormData } from 'node-fetch';
 import prettyBytes from 'pretty-bytes';
 import * as yup from 'yup';
+import os from 'node:os';
 
 import { logTreeData, treeFolderData } from './treeFolder';
 
@@ -89,9 +90,11 @@ import { log, version, validateConfiguration, randomQuote, ZIPLOCATION, printHea
     log.empty(deployment_id);
 
     // save deployment_id file to ~/.edgeserver/deployment_id
-    const deployment_id_file = createWriteStream(resolve('~/.edgeserver/deployment_id'));
-    deployment_id_file.write(deployment_id);
-    deployment_id_file.end();
+    const homeDir = os.homedir();
+    const filepath = path.join(homeDir, '.edgeserver', 'deployment_id');
+
+    mkdirSync(path.dirname(filepath), { recursive: true });
+    writeFileSync(filepath, deployment_id, 'utf-8');
 
     // log.empty(chalk.white(`[${chalk.greenBright("\u2588".repeat(32))}]`));
 

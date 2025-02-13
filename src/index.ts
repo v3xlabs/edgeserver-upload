@@ -1,11 +1,12 @@
+import os from 'node:os';
 import * as core from '@actions/core';
 import * as github from '@actions/github';
 import { createLogger } from '@lvksh/logger';
 import archiver from 'archiver';
 import chalk from 'chalk';
-import { createWriteStream, existsSync, readFileSync } from 'node:fs';
+import { createWriteStream, existsSync, readFileSync, mkdirSync } from 'node:fs';
 import { chmod, stat } from 'node:fs/promises';
-import { resolve } from 'node:path';
+import path, { resolve } from 'node:path';
 import fetch, { blobFrom, FormData } from 'node-fetch';
 import prettyBytes from 'pretty-bytes';
 import * as yup from 'yup';
@@ -100,9 +101,11 @@ import { log, version, validateConfiguration, randomQuote, ZIPLOCATION, printHea
     let target_method = 'POST';
 
     // check if ~/.edgeserver/deployment_id exists
-    const deployment_id_file = resolve('~/.edgeserver/deployment_id');
-    if (existsSync(deployment_id_file)) {
-        const deployment_id = readFileSync(deployment_id_file, 'utf8');
+
+    const homeDir = os.homedir();
+    const filepath = path.join(homeDir, '.edgeserver', 'deployment_id');
+    if (existsSync(filepath)) {
+        const deployment_id = readFileSync(filepath, 'utf8');
 
         log.empty('Uploading files for deployment ID: ' + deployment_id);
         target_url = config.server + '/site/' + config.site_id + '/deployment/' + deployment_id + '/files';
