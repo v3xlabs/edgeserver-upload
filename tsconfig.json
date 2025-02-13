@@ -3,5 +3,5 @@
         "target": "ES5",
         "esModuleInterop": true,
     },
-    "include": ["./src/index.ts"]
+    "include": ["./src/index.ts", "./src/pre.ts", "./src/post.ts"]
 }

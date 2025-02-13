@@ -22,7 +22,9 @@ inputs:
     required: false
 runs:
   using: 'node16'
-  main: 'lib/index.js'
+  main: 'lib/run/index.js'
+  pre: 'lib/pre/index.js'
+  post: 'lib/post/index.js'
 branding:
   color: yellow
   icon: upload-cloud
