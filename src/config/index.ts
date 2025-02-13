@@ -73,7 +73,7 @@ const log = createLogger(
     }
 );
 
-const version = require('../package.json')['version'];
+const version = require('../../package.json')['version'];
 
 export const printHeader = async () => {
     log.empty('', '');
