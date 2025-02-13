@@ -3,7 +3,7 @@ import * as github from '@actions/github';
 import { createLogger } from '@lvksh/logger';
 import archiver from 'archiver';
 import chalk from 'chalk';
-import { createWriteStream } from 'node:fs';
+import { createWriteStream, existsSync, readFileSync } from 'node:fs';
 import { chmod, stat } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import fetch, { blobFrom, FormData } from 'node-fetch';
@@ -63,6 +63,7 @@ import { log, version, validateConfiguration, randomQuote, ZIPLOCATION, printHea
             event: github.context.eventName,
             sha: github.context.sha,
             workflow: github.context.workflow,
+            workflow_status: 'run',
             runNumber: github.context.runNumber,
             runId: github.context.runId,
             server_url: github.context.serverUrl,
@@ -95,10 +96,25 @@ import { log, version, validateConfiguration, randomQuote, ZIPLOCATION, printHea
 
     log.empty('Uploading blob....');
 
+    let target_url = config.server + '/site/' + config.site_id + '/deployment';
+    let target_method = 'POST';
+
+    // check if ~/.edgeserver/deployment_id exists
+    const deployment_id_file = resolve('~/.edgeserver/deployment_id');
+    if (existsSync(deployment_id_file)) {
+        const deployment_id = readFileSync(deployment_id_file, 'utf8');
+
+        log.empty('Uploading files for deployment ID: ' + deployment_id);
+        target_url = config.server + '/site/' + config.site_id + '/deployment/' + deployment_id + '/files';
+        target_method = 'PATCH';
+    } else {
+        log.empty('Creating new deployment');
+    }
+
     const uploadRequest = await fetch(
-        config.server + '/site/' + config.site_id + '/deployment',
+        target_url,
         {
-            method: 'POST',
+            method: target_method,
             headers: {
                 Authorization: 'Bearer ' + config.token,
             },

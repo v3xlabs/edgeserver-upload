@@ -27,6 +27,7 @@ import { log, version, validateConfiguration, randomQuote, ZIPLOCATION, printHea
             event: github.context.eventName,
             sha: github.context.sha,
             workflow: github.context.workflow,
+            workflow_status: 'pre',
             runNumber: github.context.runNumber,
             runId: github.context.runId,
             server_url: github.context.serverUrl,
@@ -78,9 +79,19 @@ import { log, version, validateConfiguration, randomQuote, ZIPLOCATION, printHea
         return;
     }
 
-    await uploadRequest.text();
+    const response = await uploadRequest.text();
 
     log.empty(chalk.greenBright('Successfully notified the crew 😊'));
+    log.empty(response);
+
+    const deployment_id = JSON.parse(response).deployment_id;
+
+    log.empty(deployment_id);
+
+    // save deployment_id file to ~/.edgeserver/deployment_id
+    const deployment_id_file = createWriteStream(resolve('~/.edgeserver/deployment_id'));
+    deployment_id_file.write(deployment_id);
+    deployment_id_file.end();
 
     // log.empty(chalk.white(`[${chalk.greenBright("\u2588".repeat(32))}]`));
 

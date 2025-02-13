@@ -82,8 +82,8 @@ export const printHeader = async () => {
     log['⭐'](chalk.magenta`edgeserver upload` + ' action v' + version);
     log.empty(chalk.yellowBright('-'.repeat(40)));
     log.empty(
-        'Authored by ' + chalk.gray`@lvksh`,
-        'github.com/lvksh/edgeserver-upload'
+        'Authored by ' + chalk.gray`@v3xlabs`,
+        'github.com/v3xlabs/edgeserver-upload'
     );
 
     await new Promise<void>((reply) => setTimeout(reply, 1000));
