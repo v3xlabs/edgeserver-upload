@@ -1,19 +1,17 @@
 import os from 'node:os';
-import * as core from '@actions/core';
-import * as github from '@actions/github';
-import { createLogger } from '@lvksh/logger';
 import archiver from 'archiver';
 import chalk from 'chalk';
-import { createWriteStream, existsSync, readFileSync, mkdirSync } from 'node:fs';
+import { createWriteStream, existsSync, readFileSync } from 'node:fs';
 import { chmod, stat } from 'node:fs/promises';
 import path, { resolve } from 'node:path';
-import fetch, { blobFrom, FormData } from 'node-fetch';
+import { blobFrom } from 'node-fetch';
 import prettyBytes from 'pretty-bytes';
-import * as yup from 'yup';
 
 import { logTreeData, treeFolderData } from './treeFolder';
 
 import { log, version, validateConfiguration, randomQuote, ZIPLOCATION, printHeader } from './config';
+import { getGithubContext } from './github';
+import { createDeployment } from './deploy';
 
 (async () => {
     const config = await printHeader();
@@ -58,30 +56,11 @@ import { log, version, validateConfiguration, randomQuote, ZIPLOCATION, printHea
     log['🚀']('Deploying');
     log.empty(chalk.yellowBright('-'.repeat(40)));
 
-    const context = {
-        contextType: 'github-action',
-        data: {
-            event: github.context.eventName,
-            sha: github.context.sha,
-            workflow: github.context.workflow,
-            workflow_status: 'run',
-            runNumber: github.context.runNumber,
-            runId: github.context.runId,
-            server_url: github.context.serverUrl,
-            ref: github.context.ref,
-            actor: github.context.actor,
-            sender: github.context.actor,
-            commit:
-                github.context.payload['head_commit'] ||
-                    github.context.payload['commits']
-                    ? github.context.payload['commits'].at(0)
-                    : undefined,
-        },
-    };
+    const context = getGithubContext('push');
 
-    const formData = new FormData();
+    // const formData = new FormData();
 
-    if (config.context) formData.set('context', JSON.stringify(context));
+    // if (config.context) formData.set('context', JSON.stringify(context));
 
     log.empty('Loading blob....');
 
@@ -93,61 +72,26 @@ import { log, version, validateConfiguration, randomQuote, ZIPLOCATION, printHea
 
     log.empty('Blob size: ' + file.size);
 
-    formData.set('data', file);
-
     log.empty('Uploading blob....');
 
-    let target_url = config.server + '/site/' + config.site_id + '/deployment';
-    let target_method = 'POST';
-
     // check if ~/.edgeserver/deployment_id exists
+
+    let deployment_id: string | undefined;
 
     const homeDir = os.homedir();
     const filepath = path.join(homeDir, '.edgeserver', 'deployment_id');
     if (existsSync(filepath)) {
-        const deployment_id = readFileSync(filepath, 'utf8');
+        const fs_deployment_id = readFileSync(filepath, 'utf8');
+        deployment_id = fs_deployment_id;
 
-        log.empty('Uploading files for deployment ID: ' + deployment_id);
-        target_url = config.server + '/site/' + config.site_id + '/deployment/' + deployment_id + '/files';
-        target_method = 'PATCH';
+        log.empty('Uploading files for deployment ID: ' + fs_deployment_id);
     } else {
         log.empty('Creating new deployment');
     }
 
-    const uploadRequest = await fetch(
-        target_url,
-        {
-            method: target_method,
-            headers: {
-                Authorization: 'Bearer ' + config.token,
-            },
-            body: formData,
-        }
-    );
+    const fresh_deployment_id = await createDeployment(config, context, deployment_id, file);
 
-    const { status } = uploadRequest;
-
-    if (status != 200) {
-        if (status == 403) {
-            log.empty(
-                chalk.redBright(
-                    // eslint-disable-next-line quotes
-                    "Unauthorized.... Check your auth token's validity."
-                )
-            );
-        } else {
-            log.empty(
-                chalk.yellowBright('Unknown error with status code ' + status)
-            );
-        }
-
-        // eslint-disable-next-line unicorn/no-process-exit
-        process.exit(1);
-
-        return;
-    }
-
-    await uploadRequest.text();
+    log.empty('Fresh deployment ID: ' + fresh_deployment_id);
 
     log.empty(chalk.greenBright('Successfully Deployed 😊'));
 
