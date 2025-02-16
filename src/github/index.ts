@@ -1,4 +1,5 @@
 import * as github from '@actions/github';
+import { StateConfig } from '../state';
 
 export type GithubContext = {
     contextType: 'github-action';
@@ -37,7 +38,7 @@ export type GithubContext = {
     };
 };
 
-export const getGithubContext = (workflow_status: ('pre' | 'push' | 'post') & string): GithubContext => {
+export const getGithubContext = (workflow_status: ('pre' | 'push' | 'post') & string, state: StateConfig): GithubContext => {
     const context = {
         contextType: 'github-action',
         data: {
@@ -56,6 +57,9 @@ export const getGithubContext = (workflow_status: ('pre' | 'push' | 'post') & st
                     github.context.payload['commits']
                     ? github.context.payload['commits'].at(0)
                     : undefined,
+            pre_time: state.pre_time,
+            push_time: state.push_time,
+            post_time: state.post_time,
         },
     } as GithubContext;
 

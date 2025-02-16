@@ -21,7 +21,7 @@ import { getState, setState } from './state';
 
     log.empty('');
 
-    const context = getGithubContext('post');
+    const context = getGithubContext('post', state);
 
     const fresh_state = await createDeployment(config, context, state.deployment_id);
 

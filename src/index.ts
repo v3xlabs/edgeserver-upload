@@ -59,7 +59,7 @@ import { getState, setState } from './state';
     log['🚀']('Deploying');
     log.empty(chalk.yellowBright('-'.repeat(40)));
 
-    const context = getGithubContext('push');
+    const context = getGithubContext('push', state);
 
     log.empty('Loading blob....');
 

@@ -6,7 +6,7 @@ import os from 'node:os';
 import { createDeployment } from './deploy';
 import { log, printHeader } from './config';
 import { getGithubContext } from './github';
-import { setState } from './state';
+import { getState, setState } from './state';
 
 (async () => {
     const config = await printHeader();
@@ -15,14 +15,16 @@ import { setState } from './state';
     log['✨']('Shooting flares');
     log.empty(chalk.yellowBright('-'.repeat(40)));
 
-    const context = getGithubContext('pre');
+    const state = getState();
 
-    const state = await createDeployment(config, context);
+    const context = getGithubContext('pre', state);
+    
+    const fresh_state = await createDeployment(config, context);
 
-    log.empty(state);
+    log.empty(fresh_state);
 
     setState({
-        deployment_id: state.deployment_id,
+        deployment_id: fresh_state.deployment_id,
         pre_time: new Date().toISOString(),
         push_time: undefined,
         post_time: undefined,
