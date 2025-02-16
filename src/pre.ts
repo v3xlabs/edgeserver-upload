@@ -6,6 +6,7 @@ import os from 'node:os';
 import { createDeployment } from './deploy';
 import { log, printHeader } from './config';
 import { getGithubContext } from './github';
+import { setState } from './state';
 
 (async () => {
     const config = await printHeader();
@@ -16,16 +17,16 @@ import { getGithubContext } from './github';
 
     const context = getGithubContext('pre');
 
-    const deployment_id = await createDeployment(config, context);
+    const state = await createDeployment(config, context);
 
-    log.empty(deployment_id);
+    log.empty(state);
 
-    // save deployment_id file to ~/.edgeserver/deployment_id
-    const homeDir = os.homedir();
-    const filepath = path.join(homeDir, '.edgeserver', 'deployment_id');
-
-    mkdirSync(path.dirname(filepath), { recursive: true });
-    writeFileSync(filepath, deployment_id, 'utf-8');
+    setState({
+        deployment_id: state.deployment_id,
+        pre_time: new Date().toISOString(),
+        push_time: undefined,
+        post_time: undefined,
+    });
 
     // log.empty(chalk.white(`[${chalk.greenBright("\u2588".repeat(32))}]`));
 

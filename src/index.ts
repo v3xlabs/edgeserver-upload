@@ -12,9 +12,12 @@ import { logTreeData, treeFolderData } from './treeFolder';
 import { log, version, validateConfiguration, randomQuote, ZIPLOCATION, printHeader } from './config';
 import { getGithubContext } from './github';
 import { createDeployment } from './deploy';
+import { getState, setState } from './state';
 
 (async () => {
     const config = await printHeader();
+
+    const state = getState();
 
     log.empty('');
     log['📁']('Compressing Application');
@@ -58,10 +61,6 @@ import { createDeployment } from './deploy';
 
     const context = getGithubContext('push');
 
-    // const formData = new FormData();
-
-    // if (config.context) formData.set('context', JSON.stringify(context));
-
     log.empty('Loading blob....');
 
     await new Promise<void>(acc => setTimeout(acc, 2000));
@@ -74,28 +73,26 @@ import { createDeployment } from './deploy';
 
     log.empty('Uploading blob....');
 
-    // check if ~/.edgeserver/deployment_id exists
-
-    let deployment_id: string | undefined;
-
-    const homeDir = os.homedir();
-    const filepath = path.join(homeDir, '.edgeserver', 'deployment_id');
-    if (existsSync(filepath)) {
-        const fs_deployment_id = readFileSync(filepath, 'utf8');
-        deployment_id = fs_deployment_id;
-
-        log.empty('Uploading files for deployment ID: ' + fs_deployment_id);
+    if (state.deployment_id) {
+        log.empty('Uploading files for deployment ID: ' + state.deployment_id);
     } else {
         log.empty('Creating new deployment');
     }
 
-    const fresh_deployment_id = await createDeployment(config, context, deployment_id, file);
+    const fresh_state = await createDeployment(config, context, state.deployment_id, file);
 
-    log.empty('Fresh deployment ID: ' + fresh_deployment_id);
+    log.empty('Fresh deployment ID: ' + fresh_state.deployment_id);
 
     log.empty(chalk.greenBright('Successfully Deployed 😊'));
 
     // log.empty(chalk.white(`[${chalk.greenBright("\u2588".repeat(32))}]`));
+
+    setState({
+        deployment_id: fresh_state.deployment_id,
+        pre_time: state.pre_time,
+        push_time: context['push_time'],
+        post_time: undefined,
+    });
 
     log.empty('', '');
 })();

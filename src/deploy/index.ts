@@ -1,7 +1,8 @@
 import chalk from "chalk";
 import { log } from "../config";
+import { StateConfig } from "../state";
 
-export const createDeployment = async (config, context, deployment_id?: string, blob?: Blob): Promise<string> => {
+export const createDeployment = async (config, context, deployment_id?: string, blob?: Blob): Promise<StateConfig> => {
     const formData = new FormData();
 
     if (config.context) formData.set('context', JSON.stringify(context));
@@ -56,5 +57,10 @@ export const createDeployment = async (config, context, deployment_id?: string, 
 
     const fresh_deployment_id = JSON.parse(response).deployment_id;
 
-    return fresh_deployment_id;
+    return {
+        deployment_id: fresh_deployment_id,
+        pre_time: context['pre_time'],
+        push_time: context['push_time'],
+        post_time: context['post_time'],
+    };
 };

@@ -1,6 +1,43 @@
 import * as github from '@actions/github';
 
-export const getGithubContext = (workflow_status: ('pre' | 'push' | 'post') & string) => {
+export type GithubContext = {
+    contextType: 'github-action';
+    data: {
+        event: string;
+        sha: string;
+        workflow: string;
+        workflow_status: string;
+        runNumber: number;
+        runId: number;
+        server_url: string;
+        ref: string;
+        actor: string;
+        sender: string;
+        commit: {
+            id: string;
+            message: string;
+            author: {
+                name: string;
+                email: string;
+                username: string;
+            };
+            committer: {
+                name: string;
+                email: string;
+                username: string;
+            };
+            distinct: boolean;
+            timestamp: string;
+            tree_id: string;
+            url: string;
+        };
+        pre_time: string;
+        push_time: string;
+        post_time: string;
+    };
+};
+
+export const getGithubContext = (workflow_status: ('pre' | 'push' | 'post') & string): GithubContext => {
     const context = {
         contextType: 'github-action',
         data: {
@@ -20,7 +57,17 @@ export const getGithubContext = (workflow_status: ('pre' | 'push' | 'post') & st
                     ? github.context.payload['commits'].at(0)
                     : undefined,
         },
-    };
+    } as GithubContext;
+
+    const now = new Date().toISOString();
+
+    if (workflow_status == 'pre') {
+        context.data.pre_time = now;
+    } else if (workflow_status == 'post') {
+        context.data.post_time = now;
+    } else if (workflow_status == 'push') {
+        context.data.push_time = now;
+    }
 
     return context;
 };
