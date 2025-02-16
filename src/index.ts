@@ -90,8 +90,8 @@ import { getState, setState } from './state';
     setState({
         deployment_id: fresh_state.deployment_id,
         pre_time: state.pre_time,
-        push_time: context['push_time'],
-        post_time: undefined,
+        push_time: context.data.push_time,
+        post_time: context.data.post_time,
     });
 
     log.empty('', '');

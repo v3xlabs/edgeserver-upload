@@ -25,7 +25,7 @@ import { getState, setState } from './state';
 
     setState({
         deployment_id: fresh_state.deployment_id,
-        pre_time: new Date().toISOString(),
+        pre_time: context.data.pre_time,
         push_time: undefined,
         post_time: undefined,
     });
