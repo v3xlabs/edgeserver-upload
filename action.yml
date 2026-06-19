@@ -21,7 +21,7 @@ inputs:
     default: '1'
     required: false
 runs:
-  using: 'node16'
+  using: 'node24'
   main: 'lib/run/index.js'
   pre: 'lib/pre/index.js'
   post: 'lib/post/index.js'

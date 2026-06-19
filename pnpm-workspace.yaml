@@ -1,0 +1,3 @@
+allowBuilds:
+  pre-commit: false
+  spawn-sync: false
