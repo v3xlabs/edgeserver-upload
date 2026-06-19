@@ -76,6 +76,14 @@ const log = createLogger(
 
 const version = require('../../package.json')['version'];
 
+export type Config = {
+    server: string;
+    site_id: string;
+    token: string;
+    directory: string;
+    context: boolean;
+};
+
 export const printHeader = async () => {
     log.empty('', '');
 
@@ -131,8 +139,6 @@ export const printHeader = async () => {
         }
 
         process.exit(1);
-
-        return;
     }
 
     log.empty('Server: ' + chalk.gray(config.server));

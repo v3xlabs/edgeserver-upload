@@ -30,7 +30,7 @@ export const treeFolderData = async (
         a.isDirectory() ? -1 : b.isDirectory() ? 1 : 0,
     );
 
-    const result = [];
+    const result: (FileData | FolderData)[] = [];
     let totalSize = 0;
     for (let fileOrDir of filesAndDirs) {
         const path = resolve(folder_path, fileOrDir.name);
@@ -46,7 +46,7 @@ export const treeFolderData = async (
         }
         if (fileOrDir.isDirectory()) {
             const data = await treeFolderData(path);
-            result.push({ name: fileOrDir.name, type: "folder", ...data });
+            result.push({ ...data, name: fileOrDir.name });
             totalSize += data.size;
         }
     }
@@ -62,8 +62,8 @@ export const logTreeData = (
     log: GenericLogFunction,
     indents: number = 0,
 ) => {
-    if (indents != 0 && treeData["name"])
-        log(`  ${"  ".repeat(indents == 0 ? 0 : indents - 1)}${chalk.cyanBright('/' + treeData["name"])}`);
+    if (indents != 0 && 'name' in treeData)
+        log(`  ${"  ".repeat(indents == 0 ? 0 : indents - 1)}${chalk.cyanBright('/' + treeData.name)}`);
 
     for (let fileOrFolder of treeData.files) {
         if (fileOrFolder.type === "folder") {

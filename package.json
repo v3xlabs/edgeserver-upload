@@ -1,6 +1,6 @@
 {
     "name": "edgeserver-action",
-    "version": "0.2.2",
+    "version": "0.2.3",
     "description": "",
     "main": "lib/run/index.js",
     "scripts": {
@@ -16,30 +16,30 @@
     "author": "v3xlabs",
     "license": "GPL-3.0",
     "devDependencies": {
-        "@types/archiver": "^5.3.4",
+        "@types/archiver": "^7.0.0",
         "@types/cli-progress": "^3.11.6",
-        "@types/node": "^18.19.130",
-        "@typescript-eslint/parser": "^5.62.0",
-        "eslint": "^8.57.1",
+        "@types/node": "^25.9.3",
+        "@typescript-eslint/parser": "^8.61.1",
+        "eslint": "^10.5.0",
         "eslint-plugin-lvksh": "^1.4.1",
-        "pre-commit": "^1.2.2",
-        "typescript": "^4.9.5"
+        "pre-commit": "^2.0.0",
+        "typescript": "^6.0.3"
     },
     "dependencies": {
-        "@actions/core": "^1.11.1",
-        "@actions/github": "^5.1.1",
+        "@actions/core": "^3.0.1",
+        "@actions/github": "^9.1.1",
         "@lvksh/logger": "^1.6.4",
-        "@vercel/ncc": "^0.34.0",
-        "archiver": "^5.3.2",
-        "chalk": "4.0.0",
+        "@vercel/ncc": "^0.44.0",
+        "archiver": "^7.0.1",
+        "chalk": "5.6.2",
         "cli-progress": "^3.12.0",
-        "cli-spinners": "^2.9.2",
+        "cli-spinners": "^3.4.0",
         "form-data": "^4.0.6",
-        "formdata-node": "^4.4.1",
+        "formdata-node": "^6.0.3",
         "node-fetch": "^3.3.2",
-        "ora": "^6.3.1",
-        "pretty-bytes": "^6.1.1",
-        "yup": "^0.32.11",
-        "zip-a-folder": "^1.1.7"
+        "ora": "^9.4.0",
+        "pretty-bytes": "^7.1.0",
+        "yup": "^1.7.1",
+        "zip-a-folder": "^6.1.1"
     }
 }

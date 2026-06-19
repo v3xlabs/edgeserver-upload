@@ -1,8 +1,9 @@
 import chalk from "chalk";
-import { log } from "../config";
+import { log, Config } from "../config";
+import { GithubContext } from "../github";
 import { StateConfig } from "../state";
 
-export const createDeployment = async (config, context, deployment_id?: string, blob?: Blob): Promise<StateConfig> => {
+export const createDeployment = async (config: Config, context: GithubContext, deployment_id?: string, blob?: Blob): Promise<StateConfig> => {
     const formData = new FormData();
 
     if (config.context) formData.set('context', JSON.stringify(context));
@@ -46,8 +47,6 @@ export const createDeployment = async (config, context, deployment_id?: string, 
 
         // eslint-disable-next-line unicorn/no-process-exit
         process.exit(1);
-
-        return;
     }
 
     const response = await uploadRequest.text();
@@ -59,8 +58,8 @@ export const createDeployment = async (config, context, deployment_id?: string, 
 
     return {
         deployment_id: fresh_deployment_id,
-        pre_time: context['pre_time'],
-        push_time: context['push_time'],
-        post_time: context['post_time'],
+        pre_time: context.data.pre_time,
+        push_time: context.data.push_time,
+        post_time: context.data.post_time,
     };
 };

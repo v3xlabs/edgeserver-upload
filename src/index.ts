@@ -33,7 +33,7 @@ import { getState, setState } from './state';
     const writeStrem = createWriteStream(resolve('./', ZIPLOCATION));
     const zippo = archiver('zip');
 
-    zippo.on('progress', (data) => {
+    zippo.on('progress', (data: archiver.ProgressData) => {
         const percentage = Math.ceil(
             (data.fs.processedBytes / sizeData.size) * 100
         );
