@@ -2,9 +2,8 @@ import os from 'node:os';
 import archiver from 'archiver';
 import chalk from 'chalk';
 import { createWriteStream, existsSync, readFileSync } from 'node:fs';
-import { chmod, stat } from 'node:fs/promises';
+import { chmod, readFile, stat } from 'node:fs/promises';
 import path, { resolve } from 'node:path';
-import { blobFrom } from 'node-fetch';
 import prettyBytes from 'pretty-bytes';
 
 import { logTreeData, treeFolderData } from './treeFolder';
@@ -67,7 +66,8 @@ import { getState, setState } from './state';
 
     await chmod(file_path, '777');
 
-    const file = await blobFrom(file_path);
+    const buf = await readFile(file_path);
+    const file = new Blob([buf], { type: 'application/zip' });
 
     log.empty('Blob size: ' + file.size);
 

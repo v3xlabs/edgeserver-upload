@@ -4,7 +4,6 @@ import chalk from 'chalk';
 import { createWriteStream, existsSync, readFileSync } from 'node:fs';
 import { chmod, stat } from 'node:fs/promises';
 import path, { resolve } from 'node:path';
-import { blobFrom } from 'node-fetch';
 import prettyBytes from 'pretty-bytes';
 
 import { logTreeData, treeFolderData } from './treeFolder';
