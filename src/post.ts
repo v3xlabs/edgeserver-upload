@@ -1,36 +1,21 @@
-import os from 'node:os';
-import archiver from 'archiver';
-import chalk from 'chalk';
-import { createWriteStream, existsSync, readFileSync } from 'node:fs';
-import { chmod, stat } from 'node:fs/promises';
-import path, { resolve } from 'node:path';
-import prettyBytes from 'pretty-bytes';
+import { styleText } from "node:util";
 
-import { logTreeData, treeFolderData } from './treeFolder';
+import { log, printHeader } from "./config";
+import { createDeployment } from "./deploy";
+import { getGithubContext } from "./github";
+import { getState, setState } from "./state";
 
-import { log, version, validateConfiguration, randomQuote, ZIPLOCATION, printHeader } from './config';
-import { getGithubContext } from './github';
-import { createDeployment } from './deploy';
-import { getState, setState } from './state';
+void (async () => {
+  const config = await printHeader();
+  const state = getState();
+  const context = getGithubContext("post", state);
+  const freshState = await createDeployment(config, context, state.deployment_id);
 
-(async () => {
-    const config = await printHeader();
-
-    const state = getState();
-
-    log.empty('');
-
-    const context = getGithubContext('post', state);
-
-    const fresh_state = await createDeployment(config, context, state.deployment_id);
-
-    // Save state for debugging purposes
-    setState({
-        deployment_id: fresh_state.deployment_id,
-        pre_time: state.pre_time,
-        push_time: state.push_time,
-        post_time: context.data.post_time,
-    });
-
-    log.empty('', '');
+  setState({
+    deployment_id: freshState.deployment_id,
+    pre_time: state.pre_time,
+    push_time: state.push_time,
+    post_time: context.data.post_time,
+  });
+  log.empty(styleText("greenBright", "Deployment finalized. See you on the other side 🎉"));
 })();

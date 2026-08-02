@@ -1,3 +1,4 @@
 allowBuilds:
   pre-commit: false
   spawn-sync: false
+  unrs-resolver: false

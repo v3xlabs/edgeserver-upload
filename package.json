@@ -1,6 +1,6 @@
 {
     "name": "edgeserver-action",
-    "version": "0.2.4",
+    "version": "0.3.0",
     "description": "",
     "main": "lib/run/index.js",
     "scripts": {
@@ -10,36 +10,26 @@
         "build-pre": "tsc && ncc build src/pre.js -o lib/pre",
         "build-post": "tsc && ncc build src/post.js -o lib/post",
         "install-precommit": "cp ./pre-commit.sh ./.git/hooks/pre-commit",
-        "lint": "eslint -c .eslintrc.json --ext .ts ./src"
+        "lint": "eslint ."
     },
     "keywords": [],
     "author": "v3xlabs",
     "license": "GPL-3.0",
     "devDependencies": {
-        "@types/archiver": "^7.0.0",
-        "@types/cli-progress": "^3.11.6",
-        "@types/node": "^25.9.3",
-        "@typescript-eslint/parser": "^8.61.1",
-        "eslint": "^10.5.0",
-        "eslint-plugin-lvksh": "^1.4.1",
-        "pre-commit": "^2.0.0",
+        "@types/archiver": "^8.0.0",
+        "@types/node": "^24.0.0",
+        "@typescript-eslint/parser": "^8.65.0",
+        "@vercel/ncc": "^0.44.1",
+        "eslint": "^10.8.0",
+        "eslint-plugin-v3xlabs": "^1.8.1",
         "typescript": "^6.0.3"
     },
     "dependencies": {
         "@actions/core": "^3.0.1",
         "@actions/github": "^9.1.1",
         "@lvksh/logger": "^1.6.4",
-        "@vercel/ncc": "^0.44.0",
-        "archiver": "^7.0.1",
-        "chalk": "5.6.2",
-        "cli-progress": "^3.12.0",
-        "cli-spinners": "^3.4.0",
-        "form-data": "^4.0.6",
-        "formdata-node": "^6.0.3",
-        "node-fetch": "^3.3.2",
-        "ora": "^9.4.0",
+        "archiver": "^8.0.0",
         "pretty-bytes": "^7.1.0",
-        "yup": "^1.7.1",
-        "zip-a-folder": "^6.1.1"
+        "yup": "^1.7.1"
     }
 }

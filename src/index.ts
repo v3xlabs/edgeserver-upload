@@ -1,98 +1,120 @@
-import os from 'node:os';
-import archiver from 'archiver';
-import chalk from 'chalk';
-import { createWriteStream, existsSync, readFileSync } from 'node:fs';
-import { chmod, readFile, stat } from 'node:fs/promises';
-import path, { resolve } from 'node:path';
-import prettyBytes from 'pretty-bytes';
+import { createWriteStream } from "node:fs";
+import { chmod, readdir, readFile, stat } from "node:fs/promises";
+import path from "node:path";
+import { styleText } from "node:util";
 
-import { logTreeData, treeFolderData } from './treeFolder';
+import { type ProgressData, ZipArchive } from "archiver";
+import prettyBytes from "pretty-bytes";
 
-import { log, version, validateConfiguration, randomQuote, ZIPLOCATION, printHeader } from './config';
-import { getGithubContext } from './github';
-import { createDeployment } from './deploy';
-import { getState, setState } from './state';
+import { log, printHeader, ZIPLOCATION } from "./config";
+import { createDeployment } from "./deploy";
+import { getGithubContext } from "./github";
+import { getState, setState } from "./state";
 
-(async () => {
-    const config = await printHeader();
+type DirectoryStats = {
+  fileCount: number;
+  sizeBytes: number;
+};
 
-    const state = getState();
+const getDirectoryStats = async (directoryPath: string): Promise<DirectoryStats> => {
+  const entries = await readdir(directoryPath, { withFileTypes: true });
+  let fileCount = 0;
+  let sizeBytes = 0;
 
-    log.empty('');
-    log['📁']('Compressing Application');
-    log.empty(chalk.yellowBright('-'.repeat(40)));
+  for (const entry of entries) {
+    const entryPath = path.resolve(directoryPath, entry.name);
 
-    const sizeData = await treeFolderData(resolve('./', config.directory));
+    if (entry.isFile()) {
+      const entryStats = await stat(entryPath);
 
-    log.empty('Files Overview:');
-    logTreeData(sizeData, console.log);
-
-    log.empty('');
-
-    const writeStrem = createWriteStream(resolve('./', ZIPLOCATION));
-    const zippo = archiver('zip');
-
-    zippo.on('progress', (data: archiver.ProgressData) => {
-        const percentage = Math.ceil(
-            (data.fs.processedBytes / sizeData.size) * 100
-        );
-
-        log.empty('Compressing ' + (percentage > 100 ? 100 : percentage) + '%');
-    });
-
-    zippo.pipe(writeStrem);
-    zippo.directory(resolve('./', config.directory), false);
-
-    await zippo.finalize();
-
-    const file_path = resolve('./', ZIPLOCATION);
-    const compressedData = await stat(file_path);
-
-    log.empty('');
-
-    log.empty(
-        'Compressed to ' + chalk.yellowBright(prettyBytes(compressedData.size))
-    );
-
-    log.empty('');
-    log['🚀']('Deploying');
-    log.empty(chalk.yellowBright('-'.repeat(40)));
-
-    const context = getGithubContext('push', state);
-
-    log.empty('Loading blob....');
-
-    await new Promise<void>(acc => setTimeout(acc, 2000));
-
-    await chmod(file_path, '777');
-
-    const buf = await readFile(file_path);
-    const file = new Blob([buf], { type: 'application/zip' });
-
-    log.empty('Blob size: ' + file.size);
-
-    log.empty('Uploading blob....');
-
-    if (state.deployment_id) {
-        log.empty('Uploading files for deployment ID: ' + state.deployment_id);
-    } else {
-        log.empty('Creating new deployment');
+      fileCount += 1;
+      sizeBytes += entryStats.size;
+      continue;
     }
 
-    const fresh_state = await createDeployment(config, context, state.deployment_id, file);
+    if (entry.isDirectory()) {
+      const directoryStats = await getDirectoryStats(entryPath);
 
-    log.empty('Fresh deployment ID: ' + fresh_state.deployment_id);
+      fileCount += directoryStats.fileCount;
+      sizeBytes += directoryStats.sizeBytes;
+    }
+  }
 
-    log.empty(chalk.greenBright('Successfully Deployed 😊'));
+  return { fileCount, sizeBytes };
+};
 
-    // log.empty(chalk.white(`[${chalk.greenBright("\u2588".repeat(32))}]`));
+void (async () => {
+  const config = await printHeader();
+  const state = getState();
 
-    setState({
-        deployment_id: fresh_state.deployment_id,
-        pre_time: state.pre_time,
-        push_time: context.data.push_time,
-        post_time: context.data.post_time,
-    });
+  log.empty("");
+  log["📁"]("Compressing application");
 
-    log.empty('', '');
+  const directoryStats = await getDirectoryStats(path.resolve("./", config.directory));
+
+  log.empty(
+    `Preparing ${directoryStats.fileCount} files (${prettyBytes(directoryStats.sizeBytes)})`,
+  );
+
+  const filePath = path.resolve("./", ZIPLOCATION);
+  const writeStream = createWriteStream(filePath);
+  const archive = new ZipArchive();
+  let lastProgressPercentage = -10;
+
+  archive.on("progress", (data: ProgressData) => {
+    if (directoryStats.sizeBytes === 0) return;
+
+    const progressPercentage = Math.min(
+      100,
+      Math.floor((data.fs.processedBytes / directoryStats.sizeBytes) * 100),
+    );
+    const milestonePercentage = progressPercentage - (progressPercentage % 10);
+
+    if (milestonePercentage > lastProgressPercentage) {
+      lastProgressPercentage = milestonePercentage;
+      log.empty(`Compressing: ${milestonePercentage}%`);
+    }
+  });
+
+  archive.pipe(writeStream);
+  archive.directory(path.resolve("./", config.directory), false);
+  await archive.finalize();
+
+  const compressedData = await stat(filePath);
+
+  log.empty(`Archive ready: ${styleText("yellowBright", prettyBytes(compressedData.size))}`);
+
+  log.empty("");
+  log["🚀"]("Deploying");
+
+  const context = getGithubContext("push", state);
+
+  await new Promise<void>(resolveDelay => setTimeout(resolveDelay, 2000));
+  await chmod(filePath, "777");
+
+  const buffer = await readFile(filePath);
+  const file = new Blob([buffer], { type: "application/zip" });
+
+  log.empty(`Uploading archive: ${prettyBytes(file.size)}`);
+  log.empty(
+    state.deployment_id
+      ? `Updating deployment: ${state.deployment_id}`
+      : "Creating deployment",
+  );
+
+  const freshState = await createDeployment(
+    config,
+    context,
+    state.deployment_id,
+    file,
+  );
+
+  log.empty(styleText("greenBright", "Successfully deployed 😊"));
+
+  setState({
+    deployment_id: freshState.deployment_id,
+    pre_time: state.pre_time,
+    push_time: context.data.push_time,
+    post_time: context.data.post_time,
+  });
 })();

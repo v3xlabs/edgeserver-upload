@@ -1,65 +1,69 @@
-import chalk from "chalk";
-import { log, Config } from "../config";
-import { GithubContext } from "../github";
-import { StateConfig } from "../state";
+import { styleText } from "node:util";
 
-export const createDeployment = async (config: Config, context: GithubContext, deployment_id?: string, blob?: Blob): Promise<StateConfig> => {
-    const formData = new FormData();
+import { type Config, log } from "../config";
+import { type GithubContext } from "../github";
+import { type StateConfig } from "../state";
 
-    if (config.context) formData.set('context', JSON.stringify(context));
+export const createDeployment = async (
+  config: Config,
+  context: GithubContext,
+  deploymentId?: string,
+  blob?: Blob,
+): Promise<StateConfig> => {
+  const formData = new FormData();
 
-    if (blob) formData.set('data', blob);
+  if (config.context) formData.set("context", JSON.stringify(context));
 
-    let target_url = config.server + '/site/' + config.site_id + '/deployment';
-    let target_method = 'POST';
+  if (blob) formData.set("data", blob);
 
-    if (deployment_id) {
-        target_url = config.server + '/site/' + config.site_id + '/deployment/' + deployment_id + '/files';
-        target_method = 'PATCH';
-    }
+  let targetUrl = config.server + "/site/" + config.site_id + "/deployment";
+  let targetMethod = "POST";
 
-    const uploadRequest = await fetch(
-        target_url,
-        {
-            method: target_method,
-            headers: {
-                Authorization: 'Bearer ' + config.token,
-            },
-            body: formData,
-        }
+  if (deploymentId) {
+    targetUrl
+      = config.server
+        + "/site/"
+        + config.site_id
+        + "/deployment/"
+        + deploymentId
+        + "/files";
+    targetMethod = "PATCH";
+  }
+
+  const uploadRequest = await fetch(targetUrl, {
+    method: targetMethod,
+    headers: {
+      Authorization: "Bearer " + config.token,
+    },
+    body: formData,
+  });
+
+  const { status } = uploadRequest;
+
+  if (status !== 200) {
+    log.empty(
+      status === 403
+        ? styleText(
+            "redBright",
+            "Unauthorized. Check your auth token's validity.",
+          )
+        : styleText("yellowBright", `Unknown error with status code ${status}`),
     );
 
-    const { status } = uploadRequest;
+    process.exit(1);
+  }
 
-    if (status != 200) {
-        if (status == 403) {
-            log.empty(
-                chalk.redBright(
-                    // eslint-disable-next-line quotes
-                    "Unauthorized.... Check your auth token's validity."
-                )
-            );
-        } else {
-            log.empty(
-                chalk.yellowBright('Unknown error with status code ' + status)
-            );
-        }
+  const response = await uploadRequest.text();
+  const freshDeploymentId = JSON.parse(response).deployment_id;
 
-        // eslint-disable-next-line unicorn/no-process-exit
-        process.exit(1);
-    }
+  log.empty(
+    `${styleText("greenBright", "Successfully notified the crew 😊")}: ${freshDeploymentId}`,
+  );
 
-    const response = await uploadRequest.text();
-
-    log.empty(chalk.greenBright('Successfully notified the crew 😊'));
-    log.empty(response);
-
-    const fresh_deployment_id = JSON.parse(response).deployment_id;
-
-    return {
-        deployment_id: fresh_deployment_id,
-        pre_time: context.data.pre_time,
-        push_time: context.data.push_time,
-        post_time: context.data.post_time,
-    };
+  return {
+    deployment_id: freshDeploymentId,
+    pre_time: context.data.pre_time,
+    push_time: context.data.push_time,
+    post_time: context.data.post_time,
+  };
 };
