@@ -4,3 +4,6 @@ pnpm-error.log
 dist
 edgeserver_dist.zip
 *.scratch.ts
+.envrc
+.direnv/
+

@@ -1,5 +1,5 @@
 {
-  description = "openlv devshell";
+  description = "devshell";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -22,10 +22,6 @@
           nodejs_24
           pnpm_11
         ];
-
-        shellHook = ''
-          just
-        '';
       };
     });
 }
